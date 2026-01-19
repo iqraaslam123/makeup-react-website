@@ -1,0 +1,526 @@
+@import "tailwindcss";
+
+body{
+  /* background: #0a0a0a; */
+  color: rgb(10, 10, 10);
+  background-image: none;
+}
+
+.hero{
+  background-image: url("./assets/slide1.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100vh;
+  width: 100%;
+  margin-top: 70px;
+}
+.bag{
+  background-color: rgb(252, 211, 218);
+}
+ul li:hover{
+  font-weight: bold;
+  border-bottom: 2px solid rgb(251, 60, 92);
+}
+
+/* 
+@media (max-width:425px){
+  .hero{
+    height:300px;
+    width: 320px;
+
+  }
+} */
+.delivery-btn {
+  position: relative;
+  padding: 15px 40px;
+  font-size: 18px;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 8px;
+  min-width: 200px;
+}
+
+.delivery-status {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.parcel, .truck {
+  position: absolute;
+  font-size: 24px;
+}
+
+.delivery-btn.active .btn-text {
+  display: none;
+}
+
+.delivery-btn.active .delivery-status {
+  display: flex;
+}
+
+.delivery-btn.active .parcel {
+  animation: loadParcel 1s ease-in-out;
+}
+
+.delivery-btn.active .truck {
+  animation: driveAway 2s 1s ease-in-out forwards;
+}
+
+@keyframes loadParcel {
+  0% { top: -50px; opacity: 0; }
+  100% { top: 50%; opacity: 1; transform: translateY(-50%); }
+}
+
+@keyframes driveAway {
+  0% { left: 50%; transform: translateX(-50%); }
+  100% { left: 150%; }
+}
+
+
+/* Responsive Styles for Beauty Store */
+
+/* General Mobile Fixes */
+@media (max-width: 768px) {
+  /* Container padding fix */
+
+.exp-img{
+  width: 100%;
+  height: 100%;
+  margin: auto;
+}
+  .exp-div{
+    width: 100%;
+    height: 100%;
+    margin: auto;
+  }
+  /* Hero Section */
+  .hero .container {
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
+  }
+  
+  .hero h1 {
+    font-size: 2.5rem !important;
+    text-align: center;
+    margin-top: 2rem !important;
+  }
+  
+  .hero p {
+    text-align: center !important;
+    margin: 1rem 0 !important;
+  }
+  
+  .hero .flex.justify-center {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .hero button {
+    width: 100%;
+    margin: 0.25rem 0 !important;
+  }
+}
+
+/* Navbar Responsive Fixes */
+@media (max-width: 768px) {
+  /* Logo margin fix */
+  nav img.h-9 {
+    margin-left: 0 !important;
+    height: 2rem !important;
+  }
+  
+  /* Search bar positioning */
+  #navbar-search {
+    position: static !important;
+    margin-top: 1rem;
+  }
+  
+  /* Search results dropdown */
+  .absolute.top-16 {
+    top: 4rem !important;
+    margin: 100px 0.5rem !important;
+    width: calc(100% - 1rem) !important;
+  }
+  
+  /* Mobile menu items */
+  #navbar-search ul {
+    flex-direction: column;
+    width: 100%;
+    background: white;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Cart button spacing */
+  button.relative.bg-white.text-pink-600 {
+    margin-left: 0.5rem !important;
+  }
+}
+
+/* Services Section Responsive */
+@media (max-width: 1024px) {
+  .lg\:w-1\/4 {
+    width: 50% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .lg\:w-1\/4, .md\:w-1\/2 {
+    width: 100% !important;
+  }
+  
+  /* Service cards */
+  .p-4 .h-full {
+    margin-bottom: 2rem;
+  }
+  
+  .shrink-0 {
+    width: 80% !important;
+    margin: 0 auto;
+  }
+}
+
+/* Makeup Gallery Responsive */
+@media (max-width: 768px) {
+  .bag .flex.flex-wrap {
+    flex-direction: column;
+  }
+  
+  .bag .flex.flex-wrap.w-1\/2 {
+    width: 100% !important;
+  }
+  
+  .bag .flex.flex-wrap .w-1\/2,
+  .bag .flex.flex-wrap .w-full {
+    width: 50% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .bag .flex.flex-wrap .w-1\/2,
+  .bag .flex.frap .w-full {
+    width: 100% !important;
+  }
+  
+  .bag h1 {
+    font-size: 2rem !important;
+    text-align: center;
+  }
+  
+  .bag p {
+    text-align: center !important;
+    padding: 0 1rem;
+  }
+}
+
+/* Products Section Responsive */
+@media (max-width: 768px) {
+  .lg\:w-1\/2 {
+    width: 100% !important;
+  }
+  
+  .flex.sm\:flex-row {
+    flex-direction: column !important;
+    text-align: center;
+  }
+  
+  .sm\:pl-8 {
+    padding-left: 0 !important;
+    margin-top: 1rem;
+  }
+  
+  .shrink-0.rounded-lg {
+    width: 100% !important;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+}
+
+/* Experts Section Responsive */
+@media (max-width: 768px) {
+  .ml-25 {
+    margin-left: 0 !important;
+    width: 200px !important;
+    height: 200px !important;
+    margin: 0 auto;
+  }
+  
+  .sm\:w-1\/2 {
+    width: 100% !important;
+    margin-bottom: 3rem;
+  }
+}
+
+/* Membership Cards Responsive */
+@media (max-width: 1280px) {
+  .xl\:w-1\/4 {
+    width: 50% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .xl\:w-1\/4, .md\:w-1\/2 {
+    width: 100% !important;
+  }
+  
+  .relative.z-10 {
+    padding: 2rem 0 !important;
+  }
+}
+
+/* Testimonials Responsive */
+@media (max-width: 768px) {
+  #testinomial .lg\:w-1\/2 {
+    width: 100% !important;
+  }
+  
+  .grid.grid-cols-2.md\:grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem;
+  }
+}
+
+/* Contact Section Responsive */
+@media (max-width: 1024px) {
+  #contact .lg\:w-1\/2 {
+    width: 100% !important;
+  }
+  
+  #contact .lg\:pr-10 {
+    padding-right: 0 !important;
+    margin-bottom: 2rem;
+  }
+  
+  .grid.grid-cols-1.md\:grid-cols-2.gap-6 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Cart Sidebar Responsive */
+@media (max-width: 768px) {
+  .fixed.inset-y-0.right-0.w-full.md\:w-96 {
+    width: 100% !important;
+    max-width: 100%;
+  }
+  
+  .p-6.h-full.flex.flex-col {
+    padding: 1.5rem !important;
+  }
+  
+  .flex.items-center.space-x-4 {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .flex.items-center.space-x-4 > div:first-child {
+    margin-bottom: 1rem;
+  }
+  
+  .flex.items-center.space-x-2 {
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* Footer Responsive */
+@media (max-width: 768px) {
+  .res{
+    margin-top: 150px;
+  }
+  footer .lg\:w-2\/3 {
+    width: 100% !important;
+  }
+  
+  footer .flex.flex-col.lg\:flex-row {
+    flex-direction: column !important;
+  }
+  
+  footer .grid.grid-cols-2.md\:grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 2rem;
+  }
+  
+  footer .mb-10.md\:mb-0.md\:pr-10 {
+    margin-bottom: 2rem !important;
+    padding-right: 0 !important;
+  }
+}
+
+@media (max-width: 640px) {
+  footer .grid.grid-cols-2.md\:grid-cols-4 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  footer .flex.flex-col.md\:flex-row {
+    flex-direction: column !important;
+    text-align: center;
+  }
+}
+
+/* Button Responsive Fixes */
+@media (max-width: 640px) {
+  button.bg-pink-500,
+  button.bg-gray-800 {
+    width: 100%;
+    max-width: 300px;
+    margin: 0.5rem auto !important;
+    display: block;
+  }
+  
+  /* Social media buttons in services */
+  .inline-flex {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* Image Responsive Fixes */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Utility classes for better mobile spacing */
+.mobile-padding {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.mobile-margin {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+/* Fix for text overflow on mobile */
+.text-overflow-fix {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Fix for fixed navbar spacing */
+body {
+  padding-top: 4rem;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: 3.5rem;
+  }
+}
+
+/* Navbar Toggle Button Fixes */
+#mobile-menu {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Close search results when clicking outside */
+.search-results-container {
+  position: absolute;
+  z-index: 50;
+}
+
+/* Better mobile menu styling */
+#mobile-menu ul {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+#mobile-menu li {
+  border-bottom: 1px solid rgba(236, 72, 153, 0.1);
+}
+
+#mobile-menu li:last-child {
+  border-bottom: none;
+}
+
+/* Fix for search input focus on mobile */
+#mobile-search-input:focus {
+  outline: 2px solid #ec4899;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for toggles */
+#mobile-search,
+#mobile-menu,
+#navbar-menu {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Fix z-index for dropdowns */
+.absolute.top-16 {
+  z-index: 9999;
+}
+
+/* Ensure buttons are clickable on mobile */
+button, 
+a {
+  touch-action: manipulation;
+}
+
+/* Fix for mobile menu closing when clicking links */
+#mobile-menu a {
+  display: block;
+  width: 100%;
+}
+
+/* Responsive search results */
+@media (max-width: 768px) {
+  .search-results-container {
+    left: 16px;
+    right: 16px;
+    width: calc(100% - 32px);
+  }
+  
+  .search-result-item {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .search-result-item img {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Fix for cart button on very small screens */
+@media (max-width: 400px) {
+  .flex.items-center.md\\:order-2.space-x-2 {
+    gap: 0.25rem;
+  }
+  
+  button.relative.bg-white.text-pink-600 {
+    padding: 0.5rem;
+  }
+}
+
+/* Active state for mobile menu toggle */
+#navbar-toggle[aria-expanded="true"] svg {
+  transform: rotate(90deg);
+  transition: transform 0.3s ease;
+}
+
+#navbar-toggle[aria-expanded="false"] svg {
+  transform: rotate(0deg);
+  transition: transform 0.3s ease;
+}
