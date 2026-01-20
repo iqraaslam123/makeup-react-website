@@ -22,8 +22,19 @@ import m6 from "./assets/m6.jpg";
 import m7 from "./assets/m7.jpg";
 import m8 from "./assets/m8.jpg";
 import Swal from 'sweetalert2';
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 function App() {
+  useEffect(() => {
+    AOS.init({
+      duration: 800,       // animation speed
+      easing: "ease-in-out",
+      once: true,          // animation sirf aik dafa chale
+      offset: 100,         // kitna scroll par start ho
+    });
+  }, []);
+
   // States for search and cart functionality
   const [searchTerm, setSearchTerm] = useState('');
   const [cart, setCart] = useState([]);
@@ -501,7 +512,7 @@ Time: ${new Date().toLocaleTimeString()}
 
       
       {/* Hero Section */}
-      <section className="bg-gray-900 body-font hero relative" id="hero">
+      <section  data-aos="fade-up" className="bg-gray-900 body-font hero relative" id="hero">
         <div className="container mx-auto flex px-5 py-24 md:flex-row flex-col items-center h-full justify-center md:justify-start">
           <div className="lg:grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center bg-white/80 md:bg-transparent p-6 rounded-xl md:p-0 mt-20 ml-10">
             <h1 className="title-font sm:text-5xl lg:text-7xl mb-4 font-medium text-black md:text-black">
@@ -532,7 +543,7 @@ Time: ${new Date().toLocaleTimeString()}
       </section>
 
       {/* Premium Services */}
-      <section className="text-black bg-white body-font" id="services">
+      <section data-aos="fade-right"  className="text-black bg-white body-font" id="services">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col text-center w-full mb-20">
             <h1 className="sm:text-5xl lg:text-6xl font-bold title-font mb-4 text-black">OUR <span className="text-pink-600 border-b-4 border-pink-500">SPA</span> SERVICES</h1>
@@ -590,7 +601,7 @@ Time: ${new Date().toLocaleTimeString()}
       </section>
 
       {/* Makeup Section */}
-      <section className="text-black body-font bag bg-pink-200" id="makeup">
+      <section data-aos="fade-up" className="text-black body-font bag bg-pink-200" id="makeup">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col lg:flex-row w-full mb-20 items-center">
             <div className="lg:w-1/3 w-full mb-6 lg:mb-0 text-center lg:text-left ">
@@ -634,7 +645,7 @@ Time: ${new Date().toLocaleTimeString()}
       </section>
 
       {/* Experts Section */}
-      <section className="text-black bg-pink-200 body-font">
+      <section data-aos="fade-right" className="text-black bg-pink-200 body-font">
         <div className="container px-5 py-24 mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold title-font mb-12 text-black text-center">MEET OUR <span className="text-pink-600 border-b-4 border-pink-500">EXPERTS</span></h1>
           <div className="flex flex-wrap -mx-4 justify-center">
@@ -661,7 +672,7 @@ Time: ${new Date().toLocaleTimeString()}
       </section>
 
       {/* Products Section */}
-      <section className="text-black bg-gray-50 body-font" id="products">
+      <section data-aos="fade-left" className="text-black bg-gray-50 body-font" id="products">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col text-center w-full mb-20">
             <h1 className="sm:text-5xl text-4xl font-bold title-font mb-4 text-black">OUR <span className="text-pink-600 border-b-4 border-pink-500">COSMETICS</span> BRAND</h1> <br />
@@ -691,7 +702,7 @@ Time: ${new Date().toLocaleTimeString()}
       </section>
 
       {/* Products 2 Section */}
-      <section className="text-black bg-white body-font">
+      <section data-aos="fade-right" className="text-black bg-white body-font">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col text-center w-full mb-20">
             <h1 className="sm:text-5xl text-3xl font-bold title-font mb-4 text-black">BEST SELLING <span className='text-pink-600 border-b-4 border-pink-500'>PRODUCTS</span></h1>
@@ -719,7 +730,7 @@ Time: ${new Date().toLocaleTimeString()}
       </section>
 
       {/* Membership Section */}
-      <section className="text-gray-900 body-font overflow-hidden relative bg-pink-200" id="membership">
+      <section data-aos="fade-up" className="text-gray-900 body-font overflow-hidden relative bg-pink-200" id="membership">
         <div className="container px-5 py-24 mx-auto relative z-10">
           <div className="flex flex-col text-center w-full mb-20">
             <span className="text-pink-500 font-semibold tracking-widest text-sm mb-3">MEMBERSHIP PLANS</span>
@@ -787,7 +798,7 @@ Time: ${new Date().toLocaleTimeString()}
       </section>
 
       {/* Testimonials */}
-      <section className="text-gray-900 body-font bg-pink-50 font-bold" id="testinomial">
+      <section data-aos="fade-right" className="text-gray-900 body-font bg-pink-50 font-bold" id="testinomial">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col text-center w-full mb-16">
             <h1 className="sm:text-6xl  lg:text-6xl font-bold mb-4 text-black">What Our <span className="text-pink-600">Clients</span> Say</h1>
@@ -824,7 +835,7 @@ Time: ${new Date().toLocaleTimeString()}
       </section>
 
       {/* Contact Section */}
-      <section className="text-gray-900 body-font relative bg-pink-200" id="contact">
+      <section data-aos="fade-left" className="text-gray-900 body-font relative bg-pink-200" id="contact">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col text-center w-full mb-12">
             <h1 className="sm:text-3xl lg:text-6xl font-bold title-font mb-4 text-gray-900">Contact Us</h1>
@@ -859,7 +870,7 @@ Time: ${new Date().toLocaleTimeString()}
       </section>
 
       {/* Footer */}
-      <footer className="text-gray-600 body-font bg-pink-100 font-bold cursor-pointer ">
+      <footer data-aos="fade-up" className="text-gray-600 body-font bg-pink-100 font-bold cursor-pointer ">
         <div className="container px-5 py-24 mx-auto flex md:items-center lg:items-start md:flex-row flex-col flex-wrap">
           <div className="w-64 shrink-0 md:mx-0 mx-auto text-center md:text-left">
             <a className="flex title-font font-medium items-center md:justify-start justify-center text-gray-900">
