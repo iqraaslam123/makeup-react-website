@@ -125,6 +125,7 @@ img {
   .hero {
     min-height: 60vh; /* Smaller hero on mobile */
     background-position: 70% center; /* Adjust focus of bg image */
+    
   }
   h1{
     font-size: 40px;
@@ -132,5 +133,6 @@ img {
   
   body {
     padding-top: 70px;
+     overflow-x: hidden;
   }
 }
