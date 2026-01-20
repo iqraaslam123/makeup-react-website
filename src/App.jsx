@@ -34,6 +34,10 @@ function App() {
       offset: 100,         // kitna scroll par start ho
     });
   }, []);
+  AOS.init({
+  disable: "mobile", // agar mobile par animation nahi chahiye
+});
+
 
   // States for search and cart functionality
   const [searchTerm, setSearchTerm] = useState('');
