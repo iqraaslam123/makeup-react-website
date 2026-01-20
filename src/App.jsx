@@ -216,471 +216,372 @@ Time: ${new Date().toLocaleTimeString()}
 
   return (
     <>
-      {/* Search and Cart Cart Sidebar */}
+      {/* Search and Cart Sidebar */}
       <div className='nav-toggle'>
-      <div className={`fixed inset-y-0 right-0 w-full md:w-96 bg-white shadow-xl transform transition-transform duration-300 ${cartOpen ? 'translate-x-0' : 'translate-x-full'} z-50`}>
-        <div className="p-6 h-full flex flex-col">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Your Cart</h2>
-            <div className="flex space-x-2">
-              {cart.length > 0 && (
+        <div className={`fixed inset-y-0 right-0 w-full md:w-96 bg-white shadow-xl transform transition-transform duration-300 ${cartOpen ? 'translate-x-0' : 'translate-x-full'} z-50`}>
+          <div className="p-6 h-full flex flex-col">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">Your Cart</h2>
+              <div className="flex space-x-2">
+                {cart.length > 0 && (
+                  <button
+                    onClick={clearCart}
+                    className="text-sm text-red-600 hover:text-red-800 px-3 py-1"
+                  >
+                    Clear All
+                  </button>
+                )}
                 <button
-                  onClick={clearCart}
-                  className="text-sm text-red-600 hover:text-red-800 px-3 py-1"
+                  onClick={() => setCartOpen(false)}
+                  className="text-2xl text-gray-600 hover:text-gray-800"
                 >
-                  Clear All
+                  ×
                 </button>
-              )}
-              <button
-                onClick={() => setCartOpen(false)}
-                className="text-2xl text-gray-600 hover:text-gray-800"
+              </div>
+            </div>
+
+            {cart.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">🛒</div>
+                <p className="text-gray-500 text-lg">Your cart is empty</p>
+                <p className="text-gray-400 text-sm mt-2">Add some beautiful products!</p>
+              </div>
+            ) : (
+              <>
+                <div className="flex-1 overflow-y-auto">
+                  {cart.map(item => (
+                    <div key={item.id} className="flex items-center space-x-4 mb-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                      {item.image && (
+                        <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-800 truncate">{item.name}</h3>
+                        <p className="text-pink-600 font-bold">${item.price.toFixed(2)}</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded hover:bg-gray-300"
+                        >
+                          -
+                        </button>
+                        <span className="w-8 text-center font-medium">{item.quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded hover:bg-gray-300"
+                        >
+                          +
+                        </button>
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-red-500 hover:text-red-700 ml-2 transition"
+                          title="Remove item"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border-t pt-6">
+                  <div className="flex justify-between text-lg font-bold mb-2">
+                    <span>Subtotal:</span>
+                    <span>${calculateTotal().toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-600 mb-6">
+                    <span>Shipping:</span>
+                    <span>Calculated at checkout</span>
+                  </div>
+                  <div className="space-y-3">
+                    <button
+                      onClick={downloadBill}
+                      className="w-full bg-pink-600 text-white py-3 rounded-lg hover:bg-pink-700 transition font-medium"
+                    >
+                      Download Bill
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        Swal.fire({
+                          title: 'Checkout',
+                          text: 'Proceed to secure checkout?',
+                          icon: 'question',
+                          showCancelButton: true,
+                          confirmButtonColor: '#ec4899',
+                          cancelButtonColor: '#6b7280',
+                          confirmButtonText: 'Yes, proceed!'
+                        });
+                      }}
+                      className="w-full bg-white border-2 border-pink-600 text-pink-600 py-3 rounded-lg hover:bg-pink-50 transition font-medium"
+                    >
+                      Proceed to Checkout (${calculateTotal().toFixed(2)})
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Overlay for cart */}
+        {cartOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setCartOpen(false)}
+          />
+        )}
+
+        {/* Navbar */}
+        <nav className="bg-white fixed w-full z-20 top-0 left-0 border-b border-gray-200 font-bold">
+          <div className="max-w-7xl flex flex-wrap items-center justify-between mx-auto p-4">
+            {/* Logo */}
+            <a href="#" className="flex items-center space-x-3 rtl:space-x-reverse">
+              <img src={logo} className="h-8 md:h-10" alt="Beauty Store Logo" />
+            </a>
+            
+            {/* Desktop Search and Cart */}
+            <div className="flex items-center md:order-2 space-x-2">
+              {/* Mobile Search Toggle */}
+              <button 
+                type="button" 
+                id="mobile-search-toggle"
+                className="md:hidden p-2 text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                onClick={() => {
+                  const mobileSearch = document.getElementById('mobile-search');
+                  mobileSearch.classList.toggle('hidden');
+                }}
               >
-                ×
+                <svg className="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
+                </svg>
+              </button>
+              
+              {/* Desktop Search Input */}
+              <div className="relative hidden md:block">
+                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
+                  </svg>
+                </div>
+                <input 
+                  type="text" 
+                  id="desktop-search"
+                  className="block w-64  ps-9 pe-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-pink-500 focus:border-pink-500" 
+                  placeholder="Search..." 
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
+              </div>
+
+              {/* Cart Button */}
+              <button
+                onClick={() => setCartOpen(!cartOpen)}
+                className="relative bg-white text-pink-600 p-2 rounded-full hover:bg-pink-50 transition border border-pink-100"
+              >
+                <span className="text-xl">🛒</span>
+                {cart.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                    {cart.reduce((total, item) => total + item.quantity, 0)}
+                  </span>
+                )}
+              </button>
+
+              {/* Mobile Menu Toggle */}
+              <button 
+                id="navbar-toggle"
+                type="button" 
+                className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" 
+                onClick={() => {
+                  const navbarMenu = document.getElementById('navbar-menu');
+                  navbarMenu.classList.toggle('hidden');
+                }}
+              >
+                <span className="sr-only">Open main menu</span>
+                <svg className="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+              </button>
+            </div>
+            
+            {/* Mobile Search Input - Hidden by default */}
+            <div id="mobile-search" className="hidden w-full md:hidden mt-3 order-3">
+              <div className="relative">
+                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
+                  </svg>
+                </div>
+                <input 
+                  type="text" 
+                  id="mobile-search-input"
+                  className="block w-full ps-9 pe-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-pink-500 focus:border-pink-500" 
+                  placeholder="Search products..." 
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
+              </div>
+            </div>
+
+            {/* Search Results Dropdown */}
+            {searchTerm && (
+              <div className="absolute top-16 left-0 right-0 bg-white shadow-lg rounded-lg p-4 z-30 mx-4 md:mx-auto md:max-w-2xl border border-gray-100">
+                {filteredProducts.length > 0 ? (
+                  <>
+                    <p className="text-gray-600 mb-2 text-sm">
+                      Results for: <span className="font-semibold text-pink-600">"{searchTerm}"</span>
+                      <span className="ml-2 text-gray-500">
+                        ({filteredProducts.length} found)
+                      </span>
+                    </p>
+                    <div className="max-h-60 overflow-y-auto">
+                      {filteredProducts.slice(0, 5).map(product => (
+                        <div key={product.id} className="flex items-center p-2 hover:bg-gray-50 rounded border-b border-gray-100 last:border-0">
+                          {product.image && (
+                            <img src={product.image} alt={product.name} className="w-10 h-10 object-cover rounded mr-3" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-800 truncate text-sm">{product.name}</p>
+                            <p className="text-xs text-gray-600 truncate">${product.price.toFixed(2)}</p>
+                          </div>
+                          <button
+                            onClick={() => addToCart(product)}
+                            className="text-xs bg-pink-500 text-white px-3 py-1 rounded hover:bg-pink-600 whitespace-nowrap ml-2"
+                          >
+                            Add
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-gray-600 text-sm">No results found.</p>
+                    <button
+                      onClick={() => {
+                        setSearchTerm('');
+                        setFilteredProducts(productsData);
+                      }}
+                      className="mt-2 text-sm text-pink-600 hover:text-pink-700 font-medium"
+                    >
+                      Clear Search
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Navigation Menu */}
+            <div className="hidden md:flex items-center justify-between w-full md:w-auto md:order-1" id="navbar-menu">
+              <ul className="flex flex-col p-4 md:p-0 mt-4 font-bold border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white">
+                <li><a href="#hero" className="block py-2 px-3 text-pink-600 font-bold md:p-0" aria-current="page">Home</a></li>
+                <li><a href="#services" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-pink-600 md:p-0">Services</a></li>
+                <li><a href="#makeup" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-pink-600 md:p-0">Makeup</a></li>
+                <li><a href="#products" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-pink-600 md:p-0">Products</a></li>
+                <li><a href="#membership" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-pink-600 md:p-0">Membership</a></li>
+                <li><a href="#testinomial" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-pink-600 md:p-0">Testimonials</a></li>
+                <li><a href="#contact" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-pink-600 md:p-0">Contact</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          {/* Mobile Menu Dropdown (Controlled by JS) */}
+          <div id="mobile-menu" className="hidden w-full md:hidden border-t border-gray-100">
+             <ul className="flex flex-col p-4 font-medium bg-gray-50">
+               <li><a href="#hero" onClick={() => document.getElementById('navbar-menu').classList.add('hidden')} className="block py-2 px-3 text-white bg-pink-500 rounded">Home</a></li>
+               <li><a href="#services" onClick={() => document.getElementById('navbar-menu').classList.add('hidden')} className="block py-2 px-3 text-gray-900 border-b border-gray-200">Services</a></li>
+               <li><a href="#makeup" onClick={() => document.getElementById('navbar-menu').classList.add('hidden')} className="block py-2 px-3 text-gray-900 border-b border-gray-200">Makeup</a></li>
+               <li><a href="#products" onClick={() => document.getElementById('navbar-menu').classList.add('hidden')} className="block py-2 px-3 text-gray-900 border-b border-gray-200">Products</a></li>
+               <li><a href="#membership" onClick={() => document.getElementById('navbar-menu').classList.add('hidden')} className="block py-2 px-3 text-gray-900 border-b border-gray-200">Membership</a></li>
+               <li><a href="#contact" onClick={() => document.getElementById('navbar-menu').classList.add('hidden')} className="block py-2 px-3 text-gray-900">Contact</a></li>
+             </ul>
+          </div>
+        </nav>
+      </div>
+
+      
+      {/* Hero Section */}
+      <section className="bg-gray-900 body-font hero relative" id="hero">
+        <div className="container mx-auto flex px-5 py-24 md:flex-row flex-col items-center h-full justify-center md:justify-start">
+          <div className="lg:grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center bg-white/80 md:bg-transparent p-6 rounded-xl md:p-0 mt-20 ml-10">
+            <h1 className="title-font sm:text-5xl lg:text-7xl mb-4 font-medium text-black md:text-black">
+              BEST PLACE <span className='text-pink-600'>FOR YOU</span>
+              <br className="hidden lg:inline-block font-bold"/>
+              <span className='text-pink-600 '>HERBAL</span> <span className=''>TREATMENT</span>
+            </h1>
+            <p className="mb-8 leading-relaxed text-black font-medium">
+              Discover the ultimate relaxation and beauty treatments designed just for you. 
+              <br className="hidden md:inline" /> Experience luxury and care like never before.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4 w-full">
+              <button 
+                onClick={() => document.getElementById('services').scrollIntoView({ behavior: 'smooth' })} 
+                className="inline-flex text-white bg-pink-500 border-0 py-3 px-8 focus:outline-none hover:bg-pink-600 rounded text-lg font-bold justify-center"
+              >
+                See All Services
+              </button>
+              <button 
+                onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })} 
+                className="inline-flex text-white font-bold bg-gray-800 border-0 py-3 px-8 focus:outline-none hover:bg-gray-700 rounded text-lg justify-center"
+              >
+                More Details
               </button>
             </div>
           </div>
-
-          {cart.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">🛒</div>
-              <p className="text-gray-500 text-lg">Your cart is empty</p>
-              <p className="text-gray-400 text-sm mt-2">Add some beautiful products!</p>
-            </div>
-          ) : (
-            <>
-              <div className="flex-1 overflow-y-auto">
-                {cart.map(item => (
-                  <div key={item.id} className="flex items-center space-x-4 mb-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                    {item.image && (
-                      <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-800 truncate">{item.name}</h3>
-                      <p className="text-pink-600 font-bold">${item.price.toFixed(2)}</p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded hover:bg-gray-300"
-                      >
-                        -
-                      </button>
-                      <span className="w-8 text-center font-medium">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded hover:bg-gray-300"
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-red-500 hover:text-red-700 ml-2 transition"
-                        title="Remove item"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="border-t pt-6">
-                <div className="flex justify-between text-lg font-bold mb-2">
-                  <span>Subtotal:</span>
-                  <span>${calculateTotal().toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm text-gray-600 mb-6">
-                  <span>Shipping:</span>
-                  <span>Calculated at checkout</span>
-                </div>
-                <div className="space-y-3">
-                  <button
-                    onClick={downloadBill}
-                    className="w-full bg-linear-to-r from-pink-600 to-purple-600 text-white py-3 rounded-lg hover:opacity-90 transition font-medium"
-                  >
-                    Download Bill
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      Swal.fire({
-                        title: 'Checkout',
-                        text: 'Proceed to secure checkout?',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#ec4899',
-                        cancelButtonColor: '#6b7280',
-                        confirmButtonText: 'Yes, proceed!'
-                      });
-                    }}
-                    className="w-full bg-white border-2 border-pink-600 text-pink-600 py-3 rounded-lg hover:bg-pink-50 transition font-medium"
-                  >
-                    Proceed to Checkout (${calculateTotal().toFixed(2)})
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
         </div>
-      </div>
+      </section>
 
-      {/* Overlay for cart */}
-      {cartOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={() => setCartOpen(false)}
-        />
-      )}
-
-      {/* Navbar */}{/* Navbar */}
-<nav className="bg-neutral-primary fixed w-full z-20 top-0 start-0 border-b border-default">
-  <div className="max-w-7xl flex flex-wrap items-center justify-between mx-auto p-4">
-    {/* Logo */}
-    <a href="#" className="flex items-center space-x-3 rtl:space-x-reverse">
-      <img src={logo} className="h-8 md:h-9  md:ml-10" alt="Beauty Store Logo" />
-    </a>
-    
-    {/* Desktop Search and Cart */}
-    <div className="flex items-center md:order-2 space-x-2">
-      {/* Mobile Search Toggle */}
-      <button 
-        type="button" 
-        id="mobile-search-toggle"
-        className="md:hidden flex items-center justify-center text-body hover:text-heading bg-transparent box-border border border-transparent hover:bg-neutral-secondary-medium focus:ring-2 focus:ring-neutral-tertiary font-medium leading-5 rounded-base text-sm w-10 h-10 focus:outline-none"
-        onClick={() => {
-          const mobileSearch = document.getElementById('mobile-search');
-          mobileSearch.classList.toggle('hidden');
-        }}
-      >
-        <svg className="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
-        </svg>
-        <span className="sr-only">Search</span>
-      </button>
-      
-      {/* Desktop Search Input */}
-      <div className="relative hidden md:block">
-        <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-          <svg className="w-4 h-4 text-body" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
-          </svg>
-        </div>
-        <input 
-          type="text" 
-          id="desktop-search"
-          className="block w-64 ps-9 pe-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body" 
-          placeholder="Search products, services..." 
-          value={searchTerm}
-          onChange={handleSearch}
-        />
-      </div>
-
-      {/* Cart Button */}
-      <button
-        onClick={() => setCartOpen(!cartOpen)}
-        className="relative bg-white text-pink-600 p-2 rounded-full hover:bg-pink-50 transition"
-      >
-        <span className="text-xl">🛒</span>
-        {cart.length > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-            {cart.reduce((total, item) => total + item.quantity, 0)}
-          </span>
-        )}
-      </button>
-
-      {/* Mobile Menu Toggle */}
-      <button 
-        id="navbar-toggle"
-        type="button" 
-        className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-body rounded-base md:hidden hover:bg-neutral-secondary-soft hover:text-heading focus:outline-none focus:ring-2 focus:ring-neutral-tertiary" 
-        aria-controls="navbar-menu" 
-        aria-expanded="false"
-        onClick={() => {
-          const navbarMenu = document.getElementById('navbar-menu');
-          navbarMenu.classList.toggle('hidden');
-        }}
-      >
-        <span className="sr-only">Open main menu</span>
-        <svg className="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M5 7h14M5 12h14M5 17h14"/>
-        </svg>
-      </button>
-    </div>
-    
-    {/* Mobile Search Input - Hidden by default */}
-    <div id="mobile-search" className="hidden w-full md:hidden mt-3">
-      <div className="relative">
-        <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-          <svg className="w-4 h-4 text-body" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
-          </svg>
-        </div>
-        <input 
-          type="text" 
-          id="mobile-search-input"
-          className="block w-full ps-9 pe-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body" 
-          placeholder="Search products, services..." 
-          value={searchTerm}
-          onChange={handleSearch}
-        />
-      </div>
-    </div>
-
-    {/* Search Results Dropdown */}
-    {searchTerm && (
-      <div className="absolute top-16 left-0 right-0 bg-white shadow-lg rounded-lg p-4 z-30 mx-4 md:mx-auto md:left-4 md:right-4">
-        {filteredProducts.length > 0 ? (
-          <>
-            <p className="text-gray-600 mb-2">
-              Search results for: <span className="font-semibold text-pink-600">"{searchTerm}"</span>
-              <span className="ml-2 text-gray-500">
-                ({filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'} found)
-              </span>
-            </p>
-            <div className="max-h-60 overflow-y-auto">
-              {filteredProducts.slice(0, 5).map(product => (
-                <div key={product.id} className="flex items-center p-2 hover:bg-gray-50 rounded">
-                  {product.image && (
-                    <img src={product.image} alt={product.name} className="w-10 h-10 object-cover rounded mr-3" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-800 truncate">{product.name}</p>
-                    <p className="text-sm text-gray-600 truncate">${product.price.toFixed(2)} • {product.category}</p>
-                  </div>
-                  <button
-                    onClick={() => addToCart(product)}
-                    className="text-sm bg-pink-500 text-white px-3 py-1 rounded hover:bg-pink-600 whitespace-nowrap"
-                  >
-                    Add to Cart
-                  </button>
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="text-center py-4">
-            <p className="text-gray-600">
-              No results found for: <span className="font-semibold text-pink-600">"{searchTerm}"</span>
-            </p>
-            <p className="text-gray-500 text-sm mt-1">Try different keywords or check spelling</p>
-            <button
-              onClick={() => {
-                setSearchTerm('');
-                setFilteredProducts(productsData);
-              }}
-              className="mt-3 text-sm text-pink-600 hover:text-pink-700"
-            >
-              Clear Search
-            </button>
-          </div>
-        )}
-      </div>
-    )}
-
-    {/* Navigation Menu */}
-    <div className="hidden md:flex items-center justify-between w-full md:w-auto md:order-1" id="navbar-menu">
-      <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-default rounded-base bg-neutral-secondary-soft md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-neutral-primary ">
-        <li>
-          <a href="#hero" className="block py-2 px-3 text-pink-600 bg-brand rounded md:bg-transparent md:text-fg-brand md:p-0 font-bold hover:text-black" aria-current="page">Home</a>
-        </li>
-        <li>
-          <a href="#services" className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 hover:text-pink-600">Services</a>
-        </li>
-        <li>
-          <a href="#makeup" className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 hover:text-pink-600">Makeup</a>
-        </li>
-        <li>
-          <a href="#products" className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 hover:text-pink-600">Products</a>
-        </li>
-        <li>
-          <a href="#membership" className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 hover:text-pink-600">Membership</a>
-        </li>
-        <li>
-          <a href="#testinomial" className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 hover:text-pink-600">Testinomial</a>
-        </li>
-        <li>
-          <a href="#contact" className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 hover:text-pink-600">Contact</a>
-        </li>
-      </ul>
-    </div>
-
-    {/* Mobile Navigation Menu - Hidden by default */}
-    <div id="mobile-menu" className="hidden w-full md:hidden ">
-      <ul className="font-medium flex flex-col p-4 mt-4 border border-default rounded-base bg-neutral-secondary-soft">
-        <li>
-          <a href="#hero" onClick={() => document.getElementById('mobile-menu').classList.add('hidden')} className="block py-3 px-3 text-pink-600 bg-brand rounded font-bold">Home</a>
-        </li>
-        <li>
-          <a href="#services" onClick={() => document.getElementById('mobile-menu').classList.add('hidden')} className="block py-3 px-3 text-heading rounded hover:bg-neutral-tertiary hover:text-pink-600">Services</a>
-        </li>
-        <li>
-          <a href="#makeup" onClick={() => document.getElementById('mobile-menu').classList.add('hidden')} className="block py-3 px-3 text-heading rounded hover:bg-neutral-tertiary hover:text-pink-600">Makeup</a>
-        </li>
-        <li>
-          <a href="#products" onClick={() => document.getElementById('mobile-menu').classList.add('hidden')} className="block py-3 px-3 text-heading rounded hover:bg-neutral-tertiary hover:text-pink-600">Products</a>
-        </li>
-        <li>
-          <a href="#membership" onClick={() => document.getElementById('mobile-menu').classList.add('hidden')} className="block py-3 px-3 text-heading rounded hover:bg-neutral-tertiary hover:text-pink-600">Membership</a>
-        </li>
-        <li>
-          <a href="#testinomial" onClick={() => document.getElementById('mobile-menu').classList.add('hidden')} className="block py-3 px-3 text-heading rounded hover:bg-neutral-tertiary hover:text-pink-600">Testinomial</a>
-        </li>
-        <li>
-          <a href="#contact" onClick={() => document.getElementById('mobile-menu').classList.add('hidden')} className="block py-3 px-3 text-heading rounded hover:bg-neutral-tertiary hover:text-pink-600">Contact</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-      </div>
-
-      
-     {/* Hero Section */}
-<section className="bg-gray-900 body-font hero " id="hero">
-  <div className="container mx-auto flex px-4 md:px-5 py-12 md:py-24 md:flex-row flex-col items-center lg:-mt-14 ">
-    <div className="lg:grow md:w-1/2 lg:pr-24 md:pr-8 flex flex-col md:items-start md:text-left mb-12 md:mb-0 items-center text-center mt-12 md:mt-50 md:ml-10 mx-4">
-      <h1 className="title-font text-3xl sm:text-4xl lg:text-6xl mb-4 font-medium text-black text-center md:text-left">
-        BEST PLACE <span className='text-pink-600'>FOR YOU</span>
-        <br className="hidden lg:inline-block font-bold"/>
-        <span className='text-pink-600 font-bold'>HERBAL</span> <span className='font-bold'>TREATMENT</span>
-      </h1>
-      <p className="mb-8 leading-relaxed text-black text-center md:text-justify font-medium m-3">
-        Copper mug try-hard pitchfork pour-over freegan heirloom neutra air plant  <br className="hidden md:inline" /> Heirloom echo park mlkshk tote bag selvage hot chicken authentic tumeric.
-      </p>
-      <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-3 w-full max-w-md mx-auto md:mx-0">
-        <button 
-          onClick={() => document.getElementById('services').scrollIntoView({ behavior: 'smooth' })} 
-          className="inline-flex text-white bg-pink-500 border-0 py-3 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg font-bold justify-center"
-        >
-          See All Services
-        </button>
-        <button 
-          onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })} 
-          className="inline-flex text-white font-bold bg-gray-800 border-0 py-3 px-8 focus:outline-none hover:bg-gray-700 hover:text-white rounded text-lg justify-center"
-        >
-          More Details
-        </button>
-      </div>
-    </div>
-  </div>
-</section>
       {/* Premium Services */}
-      <section className="text-black bg-white body-font res " id="services">
-        <div className="container px-5 py-24 mx-auto ">
-          <div className="flex flex-col text-center w-full mb-20 ">
-            <h1 className="text-5xl font-bold title-font mb-4 text-black ">OUR  
-              <span className="text-pink-600 border-b-4"> SPA </span>
-               SERVICES</h1>
-            <p className="lg:w-2/3 mx-auto leading-relaxed text-base mt-5">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam mollitia eaque praesentium accusamus aperiam velit veniam repudiandae, doloribus dolor deserunt! Cupiditate aperiam aliquam maiores ad non quae ipsum, sed necessitatibus, porro, debitis rem dolorem est reprehenderit a corrupti enim modi.
+      <section className="text-black bg-white body-font" id="services">
+        <div className="container px-5 py-24 mx-auto">
+          <div className="flex flex-col text-center w-full mb-20">
+            <h1 className="sm:text-5xl lg:text-6xl font-bold title-font mb-4 text-black">OUR <span className="text-pink-600 border-b-4 border-pink-500">SPA</span> SERVICES</h1>
+            <p className="lg:w-2/3 mx-auto leading-relaxed text-base mt-5 text-gray-600">
+              Relax, rejuvenate, and refresh your body and mind with our premium spa services.
             </p>
           </div>
-          <div className="flex flex-wrap -m-4">
-            <div className="p-4 lg:w-1/4 md:w-1/2">
+          <div className="flex flex-wrap -m-4 justify-center">
+            {/* Service 1 */}
+            <div className="p-4 lg:w-1/4 md:w-1/2 w-full">
               <div className="h-full flex flex-col items-center text-center">
-                <img alt="team" className="shrink-0 -lg w-full h-70 object-cover object-center mb-4 border-2 rounded-full border-b-12 border-r-12 border-pink-700 pink-border hover:border hover:border-t-12 hover:border-l-12" src={s2} />
+                <img alt="Face Massage" className="shrink-0 w-full h-64 object-cover object-center mb-4 rounded-full shadow-md hover:shadow-xl transition-shadow duration-300 border-b-12 border-pink-500 border-r-8 hover:border hover:border-t-12 hover:border-l-8" src={s2} />
                 <div className="w-full">
                   <h2 className="title-font font-bold text-lg text-black">FACE MASSAGE</h2>
-                  <h3 className="text-pink-800 mb-3">ONLY $50</h3>
-                  <button onClick={() => addToCart(productsData[0])} className="bg-pink-500 text-white border-2 font-bold px-5 py-3 mb-2 rounded-[10px] hover:bg-pink-400 hover:text-black hover:border-0 cursor-pointer">Book Now</button><br />
-                  <span className="inline-flex">
-                    <a className="text-blue-700">
-                      <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
-                      </svg>
-                    </a>
-                    <a className="ml-2 text-blue-700">
-                      <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path>
-                      </svg>
-                    </a>
-                    <a className="ml-2 text-blue-700">
-                      <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path>
-                      </svg>
-                    </a>
-                  </span>
+                  <h3 className="text-pink-600 mb-3 font-semibold">ONLY $50</h3>
+                  <button onClick={() => addToCart(productsData[0])} className="bg-pink-500 text-white font-bold px-6 py-2 rounded-full hover:bg-pink-600 transition-colors w-full sm:w-auto">Book Now</button>
                 </div>
               </div>
             </div>
-            <div className="p-4 lg:w-1/4 md:w-1/2">
+            {/* Service 2 */}
+            <div className="p-4 lg:w-1/4 md:w-1/2 w-full">
               <div className="h-full flex flex-col items-center text-center">
-                <img alt="team" className="shrink-0 w-full h-70 object-cover object-center mb-4 border-2 rounded-full hover:border-b-12 hover:border-r-12 border-pink-700 pink-border hover:border border-t-12 border-l-12" src={s1} />
+                <img alt="Head Massage" className="shrink-0 w-full h-64 object-cover object-center mb-4 rounded-full shadow-md hover:shadow-xl transition-shadow duration-300 border-t-12 border-pink-500 border-l-8 hover:border hover:border-b-12 hover:border-r-8" src={s1} />
                 <div className="w-full">
                   <h2 className="title-font font-bold text-lg text-black">HEAD MASSAGE</h2>
-                  <h3 className="text-pink-800 mb-3">ONLY $60</h3>
-                  <button onClick={() => addToCart(productsData[1])} className="bg-pink-500 text-white border-2 font-bold px-5 py-3 mb-2 rounded-[10px] hover:bg-pink-400 hover:text-black hover:border-0 cursor-pointer">Book Now</button><br />
-                  <span className="inline-flex">
-                    <a className="text-blue-700">
-                      <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
-                      </svg>
-                    </a>
-                    <a className="ml-2 text-blue-700">
-                      <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path>
-                      </svg>
-                    </a>
-                    <a className="ml-2 text-blue-700">
-                      <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path>
-                      </svg>
-                    </a>
-                  </span>
+                  <h3 className="text-pink-600 mb-3 font-semibold">ONLY $60</h3>
+                  <button onClick={() => addToCart(productsData[1])} className="bg-pink-500 text-white font-bold px-6 py-2 rounded-full hover:bg-pink-600 transition-colors w-full sm:w-auto">Book Now</button>
                 </div>
               </div>
             </div>
-            <div className="p-4 lg:w-1/4 md:w-1/2">
+            {/* Service 3 */}
+            <div className="p-4 lg:w-1/4 md:w-1/2 w-full">
               <div className="h-full flex flex-col items-center text-center">
-                <img alt="team" className="shrink-0 w-full h-70 object-cover object-center mb-4 border-2 rounded-full border-b-12 border-r-12 border-pink-700 pink-border hover:border hover:border-t-12 hover:border-l-12" src={s3} />
+                <img alt="Back Massage" className="shrink-0 w-full h-64 object-cover object-center mb-4 rounded-full shadow-md hover:shadow-xl transition-shadow duration-300 border-b-12 border-pink-500 border-r-8 hover:border hover:border-t-12 hover:border-l-8" src={s3} />
                 <div className="w-full">
                   <h2 className="title-font font-bold text-lg text-black">BACK MASSAGE</h2>
-                  <h3 className="text-pink-800 mb-3">ONLY $80</h3>
-                  <button onClick={() => addToCart(productsData[2])} className="bg-pink-500 text-white border-2 font-bold px-5 py-3 mb-2 rounded-[10px] hover:bg-pink-400 hover:text-black hover:border-0 cursor-pointer">Book Now</button><br />
-                  <span className="inline-flex">
-                    <a className="text-blue-700">
-                      <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
-                      </svg>
-                    </a>
-                    <a className="ml-2 text-blue-700">
-                      <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path>
-                      </svg>
-                    </a>
-                    <a className="ml-2 text-blue-700">
-                      <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path>
-                      </svg>
-                    </a>
-                  </span>
+                  <h3 className="text-pink-600 mb-3 font-semibold">ONLY $80</h3>
+                  <button onClick={() => addToCart(productsData[2])} className="bg-pink-500 text-white font-bold px-6 py-2 rounded-full hover:bg-pink-600 transition-colors w-full sm:w-auto">Book Now</button>
                 </div>
               </div>
             </div>
-            <div className="p-4 lg:w-1/4 md:w-1/2">
+            {/* Service 4 */}
+            <div className="p-4 lg:w-1/4 md:w-1/2 w-full">
               <div className="h-full flex flex-col items-center text-center">
-                <img alt="team" className="shrink-0 w-full h-70 object-cover object-center mb-4 border-2 rounded-full hover:border-b-12 hover:border-r-12 border-pink-700 pink-border hover:border border-t-12 border-l-12" src={s4}/>
+                <img alt="Full Body Massage" className="shrink-0 w-full h-64 object-cover object-center mb-4 rounded-full shadow-md hover:shadow-xl transition-shadow duration-300 border-t-12 border-pink-500 border-l-8 hover:border hover:border-b-12 hover:border-r-8" src={s4}/>
                 <div className="w-full">
                   <h2 className="title-font font-bold text-lg text-black">FULL BODY MASSAGE</h2>
-                  <h3 className="text-pink-800 mb-3">ONLY $100</h3>
-                  <button onClick={() => addToCart(productsData[3])} className="bg-pink-500 text-white border-2 font-bold px-5 py-3 mb-2 rounded-[10px] hover:bg-pink-400 hover:text-black hover:border-0 cursor-pointer">Book Now</button><br />
-                  <span className="inline-flex">
-                    <a className="text-blue-700">
-                      <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
-                      </svg>
-                    </a>
-                    <a className="ml-2 text-blue-700">
-                      <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path>
-                      </svg>
-                    </a>
-                    <a className="ml-2 text-blue-700">
-                      <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path>
-                      </svg>
-                    </a>
-                  </span>
+                  <h3 className="text-pink-600 mb-3 font-semibold">ONLY $100</h3>
+                  <button onClick={() => addToCart(productsData[3])} className="bg-pink-500 text-white font-bold px-6 py-2 rounded-full hover:bg-pink-600 transition-colors w-full sm:w-auto">Book Now</button>
                 </div>
               </div>
             </div>
@@ -689,36 +590,43 @@ Time: ${new Date().toLocaleTimeString()}
       </section>
 
       {/* Makeup Section */}
-      <section className="text-black body-font bag" id="makeup">
-        <div className="container px-5 py-24 mx-auto flex flex-wrap">
-          <div className="flex w-full mb-20 flex-wrap">
-            <h1 className="sm:text-4xl lg:text-6xl font-bold title-font text-black lg:w-1/3 lg:mb-0 mb-4"> OUR <span className="text-pink-600"> MAKEUP</span>  SERVICES </h1>
-            <p className="lg:pl-6 lg:w-2/3 mx-auto leading-relaxed text-base mt-4 sm:leading-relaxed">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repellendus veritatis asperiores aspernatur voluptatem voluptatibus quod cupiditate <br />
-            <button onClick={() => addToCart(productsData[4])} className="bg-pink-500 text-white border-2 font-bold px-5 py-3 mb-2 rounded-[10px] hover:bg-pink-400 hover:text-black hover:border-0 cursor-pointer mt-5">Book FOR YOUR SPECIAL DAY </button>
+      <section className="text-black body-font bag bg-pink-200" id="makeup">
+        <div className="container px-5 py-24 mx-auto">
+          <div className="flex flex-col lg:flex-row w-full mb-20 items-center">
+            <div className="lg:w-1/3 w-full mb-6 lg:mb-0 text-center lg:text-left ">
+              <h1 className="sm:text-4xl lg:text-5xl font-bold title-font text-black mb-2">OUR <span className="text-pink-600">MAKEUP</span> SERVICES</h1>
+              <div className="h-1 w-20 bg-pink-500 rounded mx-auto lg:mx-0"></div>
+            </div>
+            <p className="lg:w-2/3 w-full leading-relaxed text-base text-center lg:text-left mr-5">
+              From natural glow to glamorous bridal looks, our expert makeup artists bring out your best features.
+              <br />
+              <button onClick={() => addToCart(productsData[4])} className="mt-4 bg-pink-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-pink-700 transition shadow-lg">
+                BOOK FOR YOUR SPECIAL DAY
+              </button>
             </p>
           </div>
+          
           <div className="flex flex-wrap md:-m-2 -m-1">
-            <div className="flex flex-wrap w-1/2">
+            <div className="flex flex-wrap w-full md:w-1/2">
               <div className="md:p-2 p-1 w-1/2">
-                <img alt="gallery" className="w-full object-cover h-full object-center border-4 border-pink-600 rounded block" src={b1} />
+                <img alt="gallery" className="w-full object-cover h-full object-center block rounded-lg shadow-md hover:opacity-90 transition border-3 border-pink-600 " src={b1} />
               </div>
               <div className="md:p-2 p-1 w-1/2">
-                <img alt="gallery" className="w-full object-cover h-full object-center block border-4 border-pink-600 rounded" src={b2} />
+                <img alt="gallery" className="w-full object-cover h-full object-center block rounded-lg shadow-md hover:opacity-90 transition border-3 border-pink-600" src={b2} />
               </div>
               <div className="md:p-2 p-1 w-full">
-                <img alt="gallery" className="w-full h-full object-cover object-center block border-4 border-pink-600 rounded" src={b3} />
+                <img alt="gallery" className="w-full h-64 md:h-full object-cover object-center block rounded-lg shadow-md hover:opacity-90 transition border-3 border-pink-600" src={b3} />
               </div>
             </div>
-            <div className="flex flex-wrap w-1/2">
+            <div className="flex flex-wrap w-full md:w-1/2">
               <div className="md:p-2 p-1 w-full">
-                <img alt="gallery" className="w-full h-full object-cover object-center block border-4 border-pink-600 rounded" src={b5} />
+                <img alt="gallery" className="w-full h-64 md:h-full object-cover object-center block rounded-lg shadow-md hover:opacity-90 transition border-3 border-pink-600" src={b5} />
               </div>
               <div className="md:p-2 p-1 w-1/2">
-                <img alt="gallery" className="w-full object-cover h-full object-center block border-4 border-pink-600 rounded" src={b4} />
+                <img alt="gallery" className="w-full object-cover h-full object-center block rounded-lg shadow-md hover:opacity-90 transition border-3 border-pink-600" src={b4} />
               </div>
               <div className="md:p-2 p-1 w-1/2">
-                <img alt="gallery" className="w-full object-cover h-full object-center block border-4 border-pink-600 rounded" src={b6} />
+                <img alt="gallery" className="w-full object-cover h-full object-center block rounded-lg shadow-md hover:opacity-90 transition border-3 border-pink-600" src={b6} />
               </div>
             </div>
           </div>
@@ -726,577 +634,294 @@ Time: ${new Date().toLocaleTimeString()}
       </section>
 
       {/* Experts Section */}
-      <section className="text-black-400 bag body-font">
+      <section className="text-black bg-pink-200 body-font">
         <div className="container px-5 py-24 mx-auto">
-          <h1 className="text-5xl font-bold title-font mb-4 text-black text-center">MEET OUR
-            <span className="text-pink-600 border-b-4"> EXPERTS</span>
-          </h1>
-          <div className="flex flex-wrap -mx-4 -mb-10 text-center">
-            <div className="sm:w-1/2 mb-10 px-4">
-              <div className="rounded-full w-100 h-100 overflow-hidden border-b-12 border-r-12 border-pink-700 pink-border hover:border hover:border-t-12 hover:border-l-12 ml-25 exp-div">
-                <img alt="content" className="object-cover object-center h-full w-full exp-img" src={ex2} />
+          <h1 className="text-4xl md:text-5xl font-bold title-font mb-12 text-black text-center">MEET OUR <span className="text-pink-600 border-b-4 border-pink-500">EXPERTS</span></h1>
+          <div className="flex flex-wrap -mx-4 justify-center">
+            {/* Expert 1 */}
+            <div className="w-full md:w-1/2 lg:w-1/3 mb-10 px-4 text-center">
+              <div className="w-64 h-64 mx-auto rounded-full overflow-hidden border-4 border-pink-500 borber-r-12 border-t-8 hover:border hover:border-b-12 hover:border-l-10 shadow-xl mb-6 ">
+                <img alt="Makeup Artist" className="object-cover object-center h-full w-full" src={ex2} />
               </div>
-              <h2 className="title-font text-2xl font-medium text-pink-600 mt-6 mb-3">Best Makeup Artist</h2>
-              <p className="leading-relaxed text-center font-bold">Available with 50% off..<br/> so What are you waiting for just click and enjoy</p>
-              <button onClick={() => addToCart(productsData[18])} className="flex mx-auto mt-6 text-white bg-pink-500 border-0 py-2 px-5 focus:outline-none hover:bg-pink-600 rounded-[10px] cursor-pointer">SELECT NOW</button>
+              <h2 className="title-font text-2xl font-bold text-pink-600 mb-2">Best Makeup Artist</h2>
+              <p className="leading-relaxed text-gray-600 font-medium mb-4">Available with 50% off.<br/>Book now for a transformation.</p>
+              <button onClick={() => addToCart(productsData[18])} className="inline-flex text-white bg-pink-500 border-0 py-2 px-6 focus:outline-none hover:bg-pink-600 rounded text-lg">Select</button>
             </div>
-            <div className="sm:w-1/2 mb-10 px-4">
-              <div className="rounded-full w-100 h-100 overflow-hidden hover:border-b-12 hover:border-r-12 border-pink-700 pink-border hover:border border-t-12 border-l-12 ml-25">
-                <img alt="content" className="object-cover object-center h-full w-full exp-img" src={ex3} />
+            {/* Expert 2 */}
+            <div className="w-full md:w-1/2 lg:w-1/3 mb-10 px-4 text-center">
+              <div className="w-64 h-64 mx-auto rounded-full overflow-hidden border-4 border-pink-500 borber-r-12 border-t-8 hover:border hover:border-b-12 hover:border-l-10 shadow-xl mb-6 ">
+                <img alt="Hair Stylist" className="object-cover object-center h-full w-full" src={ex3} />
               </div>
-              <h2 className="title-font text-2xl font-medium text-pink-600 mt-6 mb-3">Best Hair Stylist</h2>
-              <p className="leading-relaxed text-base font-bold">Available with 50% off..<br/> so What are you waiting for just click and enjoy</p>
-              <button onClick={() => addToCart(productsData[19])} className="flex mx-auto mt-6 text-white bg-pink-500 border-0 py-2 px-5 focus:outline-none hover:bg-pink-600 rounded-[10px] cursor-pointer">SELECT NOW</button>
+              <h2 className="title-font text-2xl font-bold text-pink-600 mb-2">Best Hair Stylist</h2>
+              <p className="leading-relaxed text-gray-600 font-medium mb-4">Available with 50% off.<br/>Expert styling for any occasion.</p>
+              <button onClick={() => addToCart(productsData[19])} className="inline-flex text-white bg-pink-500 border-0 py-2 px-6 focus:outline-none hover:bg-pink-600 rounded text-lg">Select</button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Products Section - Updated all Add to Cart buttons */}
-      <section className="text-black bg-white body-font" id="products">
+      {/* Products Section */}
+      <section className="text-black bg-gray-50 body-font" id="products">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col text-center w-full mb-20">
-            <h1 className="text-5xl font-bold title-font mb-4 text-black tracking-widest">OUR <span className="text-pink-600 border-b-4">COSMETICS</span> BRAND </h1>
-            <p className="lg:w-2/3 mx-auto leading-relaxed text-base mt-4">Whatever cardigan tote bag tumblr hexagon brooklyn asymmetrical gentrify, subway tile poke farm-to-table. Franzen you probably haven't heard of them.</p>
+            <h1 className="sm:text-5xl text-4xl font-bold title-font mb-4 text-black">OUR <span className="text-pink-600 border-b-4 border-pink-500">COSMETICS</span> BRAND</h1> <br />
+            <p className="lg:w-2/3 mx-auto leading-relaxed text-base text-gray-600">Premium quality cosmetics for your daily beauty routine.</p>
           </div>
           <div className="flex flex-wrap -m-4">
-            <div className="p-4 lg:w-1/2">
-              <div className="h-full flex sm:flex-row flex-col items-center sm:justify-start justify-center text-center sm:text-left">
-                <img alt="team" className="shrink-0 rounded-lg w-48 h-48 object-cover object-center sm:mb-0 mb-4 border-4 border-amber-700" src={m1} />
-                <div className="grow sm:pl-8">
-                  <h3 className="text-black font-bold mb-2">Foundation's</h3>
-                  <p className="mb-4">DIY tote bag drinking vinegar cronut adaptogen squid fanny pack vaporware. <br />
-                    <button onClick={() => addToCart(productsData[10])} className="bg-pink-500 text-white border-2 font-bold px-5 py-3 mb-2 rounded-[10px] hover:bg-pink-400 hover:text-black hover:border-0 cursor-pointer mt-5">Add To Cart</button>
-                  </p>
+            {/* Product Items */}
+            {[
+              { img: m1, title: "Foundations", desc: "Flawless coverage for all skin tones.", id: 10 },
+              { img: m2, title: "Highlighters", desc: "Get that perfect glow instantly.", id: 11 },
+              { img: m3, title: "Nail Paints", desc: "Vibrant colors that last longer.", id: 12 },
+              { img: m4, title: "Fragrances", desc: "Scents that leave a lasting impression.", id: 13 }
+            ].map((item, index) => (
+              <div key={index} className="p-4 lg:w-1/2 w-full">
+                <div className="h-full flex sm:flex-row flex-col items-center sm:justify-start justify-center text-center sm:text-left bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                  <img alt={item.title} className="shrink-0 rounded-lg w-48 h-48 object-cover object-center sm:mb-0 mb-4 border-4 border-pink-700 " src={item.img} />
+                  <div className="grow sm:pl-8">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
+                    <p className="mb-4 text-gray-600">{item.desc}</p>
+                    <button onClick={() => addToCart(productsData[item.id])} className="bg-pink-500 text-white font-bold px-4 py-2 rounded hover:bg-pink-600 transition">Add To Cart</button>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="p-4 lg:w-1/2">
-              <div className="h-full flex sm:flex-row flex-col items-center sm:justify-start justify-center text-center sm:text-left">
-                <img alt="team" className="shrink-0 rounded-lg w-48 h-48 object-cover object-center sm:mb-0 mb-4 border-4 border-amber-700" src={m2} />
-                <div className="grow sm:pl-8">
-                  <h3 className="text-black font-bold mb-2">Highliter's</h3>
-                  <p className="mb-4">DIY tote bag drinking vinegar cronut adaptogen squid fanny pack vaporware. <br />
-                    <button onClick={() => addToCart(productsData[11])} className="bg-pink-500 text-white border-2 font-bold px-5 py-3 mb-2 rounded-[10px] hover:bg-pink-400 hover:text-black hover:border-0 cursor-pointer mt-5">Add To Cart</button>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-4 lg:w-1/2">
-              <div className="h-full flex sm:flex-row flex-col items-center sm:justify-start justify-center text-center sm:text-left">
-                <img alt="team" className="shrink-0 rounded-lg w-48 h-48 object-cover object-center sm:mb-0 mb-4 border-4 border-amber-700" src={m3} />
-                <div className="grow sm:pl-8">
-                  <h3 className="text-black font-bold mb-2">Nail paint's</h3>
-                  <p className="mb-4">DIY tote bag drinking vinegar cronut adaptogen squid fanny pack vaporware. <br />
-                    <button onClick={() => addToCart(productsData[12])} className="bg-pink-500 text-white border-2 font-bold px-5 py-3 mb-2 rounded-[10px] hover:bg-pink-400 hover:text-black hover:border-0 cursor-pointer mt-5">Add To Cart</button>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-4 lg:w-1/2">
-              <div className="h-full flex sm:flex-row flex-col items-center sm:justify-start justify-center text-center sm:text-left">
-                <img alt="team" className="shrink-0 rounded-lg w-48 h-48 object-cover object-center sm:mb-0 mb-4 border-4 border-amber-700" src={m4} />
-                <div className="grow sm:pl-8">
-                  <h3 className="text-black font-bold mb-2">Fragnance's</h3>
-                  <p className="mb-4">DIY tote bag drinking vinegar cronut adaptogen squid fanny pack vaporware. <br />
-                    <button onClick={() => addToCart(productsData[13])} className="bg-pink-500 text-white border-2 font-bold px-5 py-3 mb-2 rounded-[10px] hover:bg-pink-400 hover:text-black hover:border-0 cursor-pointer mt-5">Add To Cart</button>
-                  </p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Products 2 Section */}
-      <section className="text-black bg-white body-font -mt-17.5">
+      <section className="text-black bg-white body-font">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col text-center w-full mb-20">
-            <h1 className="text-5xl font-bold title-font mb-4 text-black tracking-widest">OUR MOST SELLING <span className='text-pink-600 border-b-5'>PRODUCTS</span> </h1>
-            <p className="lg:w-2/3 mx-auto leading-relaxed text-base mt-4">Whatever cardigan tote bag tumblr hexagon brooklyn asymmetrical gentrify, subway tile poke farm-to-table. Franzen you probably haven't heard of them.</p>
+            <h1 className="sm:text-5xl text-3xl font-bold title-font mb-4 text-black">BEST SELLING <span className='text-pink-600 border-b-4 border-pink-500'>PRODUCTS</span></h1>
           </div>
           <div className="flex flex-wrap -m-4">
-            <div className="p-4 lg:w-1/2">
-              <div className="h-full flex sm:flex-row flex-col items-center sm:justify-start justify-center text-center sm:text-left">
-                <img alt="team" className="shrink-0 rounded-lg w-48 h-48 object-cover object-center sm:mb-0 mb-4 border-5 border-pink-800" src={m5} />
-                <div className="grow sm:pl-8">
-                  <h3 className="text-black font-bold mb-2">Powders's</h3>
-                  <p className="mb-4">DIY tote bag drinking vinegar cronut adaptogen squid fanny pack vaporware. <br />
-                    <button onClick={() => addToCart(productsData[14])} className="bg-pink-500 text-white border-2 font-bold px-5 py-3 mb-2 rounded-[10px] hover:bg-pink-400 hover:text-black hover:border-0 cursor-pointer mt-5">Add To Cart</button>
-                  </p>
+             {[
+              { img: m5, title: "Powders", desc: "Set your makeup perfectly.", id: 14 },
+              { img: m6, title: "Lipsticks", desc: "Rich color and moisture.", id: 15 },
+              { img: m7, title: "Lip Gloss", desc: "Shine bright like a diamond.", id: 16 },
+              { img: m8, title: "Concealers", desc: "Hide imperfections effortlessly.", id: 17 }
+            ].map((item, index) => (
+              <div key={index} className="p-4 lg:w-1/2 w-full">
+                <div className="h-full flex sm:flex-row flex-col items-center sm:justify-start justify-center text-center sm:text-left bg-gray-50 p-6 rounded-lg shadow-sm hover:shadow-md transition border border-gray-100">
+                  <img alt={item.title} className="shrink-0 rounded-lg w-48 h-48 object-cover object-center sm:mb-0 mb-4 border-4 border-pink-600" src={item.img} />
+                  <div className="grow sm:pl-8">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
+                    <p className="mb-4 text-gray-600">{item.desc}</p>
+                    <button onClick={() => addToCart(productsData[item.id])} className="bg-pink-500 text-white font-bold px-4 py-2 rounded hover:bg-pink-600 transition">Add To Cart</button>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="p-4 lg:w-1/2">
-              <div className="h-full flex sm:flex-row flex-col items-center sm:justify-start justify-center text-center sm:text-left">
-                <img alt="team" className="shrink-0 rounded-lg w-48 h-60 object-cover object-center sm:mb-0 mb-4 border-5 border-pink-800" src={m6} />
-                <div className="grow sm:pl-8">
-                  <h3 className="text-black font-bold mb-2">Lipstick's</h3>
-                  <p className="mb-4">DIY tote bag drinking vinegar cronut adaptogen squid fanny pack vaporware. <br />
-                    <button onClick={() => addToCart(productsData[15])} className="bg-pink-500 text-white border-2 font-bold px-5 py-3 mb-2 rounded-[10px] hover:bg-pink-400 hover:text-black hover:border-0 cursor-pointer mt-5">Add To Cart</button>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-4 lg:w-1/2">
-              <div className="h-full flex sm:flex-row flex-col items-center sm:justify-start justify-center text-center sm:text-left">
-                <img alt="team" className="shrink-0 rounded-lg w-48 h-48 object-cover object-center sm:mb-0 mb-4 border-5 border-pink-800" src={m7} />
-                <div className="grow sm:pl-8">
-                  <h3 className="text-black font-bold mb-2">lipstick's</h3>
-                  <p className="mb-4">DIY tote bag drinking vinegar cronut adaptogen squid fanny pack vaporware. <br />
-                    <button onClick={() => addToCart(productsData[16])} className="bg-pink-500 text-white border-2 font-bold px-5 py-3 mb-2 rounded-[10px] hover:bg-pink-400 hover:text-black hover:border-0 cursor-pointer mt-5">Add To Cart</button>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-4 lg:w-1/2">
-              <div className="h-full flex sm:flex-row flex-col items-center sm:justify-start justify-center text-center sm:text-left">
-                <img alt="team" className="shrink-0 rounded-lg w-48 h-48 object-cover object-center sm:mb-0 mb-4 border-5 border-pink-800" src={m8} />
-                <div className="grow sm:pl-8">
-                  <h3 className="text-black font-bold mb-2">Foundation's</h3>
-                  <p className="mb-4">DIY tote bag drinking vinegar cronut adaptogen squid fanny pack vaporware. <br />
-                    <button onClick={() => addToCart(productsData[17])} className="bg-pink-500 text-white border-2 font-bold px-5 py-3 mb-2 rounded-[10px] hover:bg-pink-400 hover:text-black hover:border-0 cursor-pointer mt-5">Add To Cart</button>
-                  </p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Membership Section */}
-      <section className="text-gray-900 body-font overflow-hidden relative" id="membership">
-        {/* ... Your existing membership code ... */}
+      <section className="text-gray-900 body-font overflow-hidden relative bg-pink-200" id="membership">
         <div className="container px-5 py-24 mx-auto relative z-10">
           <div className="flex flex-col text-center w-full mb-20">
             <span className="text-pink-500 font-semibold tracking-widest text-sm mb-3">MEMBERSHIP PLANS</span>
-            <h1 className="sm:text-5xl text-4xl font-bold mb-4 bg-linear-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent">
-              Choose Your Perfect Plan
+            <h1 className="sm:text-5xl lg:text-6xl font-bold mb-4 text-gray-900">
+              Choose Your 
+              <span className="text-pink-600"> Perfect </span> Plan
             </h1>
-            <p className="lg:w-2/3 mx-auto leading-relaxed text-gray-600 text-lg">Flexible pricing designed to grow with you. Start free, upgrade anytime.</p>
+            <p className="lg:w-2/3 mx-auto leading-relaxed text-gray-600 text-lg">Flexible pricing designed to grow with you.</p>
           </div>
           
           <div className="flex flex-wrap -m-4 justify-center">
             {/* Free Plan */}
-            <div className="p-4 xl:w-1/4 md:w-1/2 w-full transform hover:-translate-y-2 transition-all duration-300">
-              <div className="h-full p-8 rounded-2xl bg-white border-2 border-pink-100 flex flex-col relative overflow-hidden shadow-xl hover:shadow-2xl">
-                <h2 className="text-sm tracking-widest text-pink-500 title-font mb-1 font-semibold uppercase">STARTER</h2>
-                <h1 className="text-5xl text-gray-900 pb-4 mb-6 border-b border-pink-100 leading-none">
-                  <span className="font-bold">Free</span>
-                </h1>
-                <div className="space-y-4 mb-8 grow">
-                  {/* ... features ... */}
-                </div>
-                <button onClick={() => addToCart(productsData[20])} className="w-full py-4 px-6 bg-linear-to-r from-pink-100 to-rose-50 text-pink-600 font-semibold rounded-xl hover:from-pink-200 hover:to-rose-100 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl">
-                  Get Started Free
-                </button>
+            <div className="p-4 xl:w-1/3 md:w-1/2 w-full">
+              <div className="h-full p-6 rounded-lg border-2 border-pink-600 flex flex-col relative overflow-hidden hover:border-pink-300 transition-colors bg-white">
+                <h2 className="text-sm tracking-widest title-font mb-1 font-medium">STARTER</h2>
+                <h1 className="text-5xl text-gray-900 pb-4 mb-4 border-b border-gray-200 leading-none">Free</h1>
+                <p className="flex items-center text-gray-600 mb-2">
+                  <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full shrink-0">✓</span>
+                  Access to basic tutorials
+                </p>
+                <button onClick={() => addToCart(productsData[20])} className="flex items-center mt-auto text-white bg-gray-400 border-0 py-2 px-4 w-full focus:outline-none hover:bg-gray-500 rounded">Get Started</button>
               </div>
             </div>
-
             {/* Pro Plan */}
-            <div className="p-4 xl:w-1/4 md:w-1/2 w-full transform hover:-translate-y-2 transition-all duration-300">
-              <div className="relative">
-                <div className="relative h-full p-8 rounded-2xl bg-white flex flex-col overflow-hidden shadow-2xl">
-                  <h2 className="text-sm tracking-widest text-pink-500 title-font mb-1 font-semibold uppercase mt-2">PROFESSIONAL</h2>
-                  <div className="flex items-baseline my-6">
-                    <span className="text-5xl font-bold text-gray-900">$38</span>
-                    <span className="ml-2 text-gray-500">/month</span>
-                  </div>
-                  <div className="space-y-4 mb-8 grow">
-                    {/* ... features ... */}
-                  </div>
-                  <button onClick={() => addToCart(productsData[21])} className="w-full py-4 px-6 bg-linear-to-r from-pink-500 to-rose-500 text-white font-semibold rounded-xl hover:from-pink-600 hover:to-rose-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl group">
-                    Start Free Trial
-                  </button>
-                </div>
+            <div className="p-4 xl:w-1/3 md:w-1/2 w-full">
+              <div className="h-full p-6 rounded-lg border-2 border-pink-500 flex flex-col relative overflow-hidden bg-white shadow-lg transform md:-translate-y-2">
+                <span className="bg-pink-500 text-white px-3 py-1 tracking-widest text-xs absolute right-0 top-0 rounded-bl">POPULAR</span>
+                <h2 className="text-sm tracking-widest title-font mb-1 font-medium">PROFESSIONAL</h2>
+                <h1 className="text-5xl text-gray-900 leading-none flex items-baseline pb-4 mb-4 border-b border-gray-200">
+                  <span>$38</span>
+                  <span className="text-lg ml-1 font-normal text-gray-500">/mo</span>
+                </h1>
+                 <p className="flex items-center text-gray-600 mb-2">
+                  <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-pink-500 text-white rounded-full shrink-0">✓</span>
+                  Priority booking
+                </p>
+                <p className="flex items-center text-gray-600 mb-2">
+                  <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-pink-500 text-white rounded-full shrink-0">✓</span>
+                  10% off on products
+                </p>
+                <button onClick={() => addToCart(productsData[21])} className="flex items-center mt-auto text-white bg-pink-500 border-0 py-2 px-4 w-full focus:outline-none hover:bg-pink-600 rounded">Get Started</button>
               </div>
             </div>
-
             {/* Business Plan */}
-            <div className="p-4 xl:w-1/4 md:w-1/2 w-full transform hover:-translate-y-2 transition-all duration-300">
-              <div className="h-full p-8 rounded-2xl bg-linear-to-b from-white to-pink-50 border-2 border-rose-100 flex flex-col relative overflow-hidden shadow-xl hover:shadow-2xl">
-                <div className="flex items-center mb-2">
-                  <h2 className="text-sm tracking-widest text-pink-500 title-font font-semibold uppercase">ENTERPRISE</h2>
-                </div>
-                <div className="flex items-baseline my-6">
-                  <span className="text-5xl font-bold text-gray-900">$72</span>
-                  <span className="ml-2 text-gray-500">/month</span>
-                </div>
-                <div className="space-y-4 mb-8 grow">
-                  {/* ... features ... */}
-                </div>
-                <button onClick={() => addToCart(productsData[22])} className="w-full py-4 px-6 bg-linear-to-r from-rose-500 to-pink-500 text-white font-semibold rounded-xl hover:from-rose-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl group">
-                  Contact Sales
-                </button>
+            <div className="p-4 xl:w-1/3 md:w-1/2 w-full">
+               <div className="h-full p-6 rounded-lg border-2 border-pink-600 flex flex-col relative overflow-hidden hover:border-pink-300 transition-colors bg-white">
+                <h2 className="text-sm tracking-widest title-font mb-1 font-medium">ENTERPRISE</h2>
+                <h1 className="text-5xl text-gray-900 leading-none flex items-baseline pb-4 mb-4 border-b border-gray-200">
+                  <span>$72</span>
+                  <span className="text-lg ml-1 font-normal text-gray-500">/mo</span>
+                </h1>
+                <p className="flex items-center text-gray-600 mb-2">
+                  <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full shrink-0">✓</span>
+                  All Professional features
+                </p>
+                 <p className="flex items-center text-gray-600 mb-2">
+                  <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full shrink-0">✓</span>
+                  Exclusive VIP events
+                </p>
+                <button onClick={() => addToCart(productsData[22])} className="flex items-center mt-auto text-white bg-gray-400 border-0 py-2 px-4 w-full focus:outline-none hover:bg-gray-500 rounded">Contact Sales</button>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Rest of your existing sections remain exactly the same */}
-      {/* Enhanced Testimonials */}
-<section class="text-gray-900 body-font relative overflow-hidden" id="testinomial">
-  {/* Background Pattern */}
-  <div class="absolute inset-0 bg-linear-to-br from-white via-pink-50 to-rose-50 -z-10"></div>
-  <div class="absolute top-0 right-0 w-64 h-64 bg-pink-200 rounded-full -mr-32 -mt-32 opacity-30"></div>
-  <div class="absolute bottom-0 left-0 w-64 h-64 bg-rose-200 rounded-full -ml-32 -mb-32 opacity-30"></div>
-  
-  <div class="container px-5 py-24 mx-auto">
-    <div class="flex flex-col text-center w-full mb-16">
-      <span class="text-pink-500 font-semibold tracking-widest text-sm mb-3">TESTIMONIALS</span>
-      <h1 class="sm:text-4xl text-3xl font-bold mb-4">What Our <span class="bg-linear-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent">Customers Say</span></h1>
-      <p class="lg:w-2/3 mx-auto leading-relaxed text-gray-600">Join 10,000+ satisfied customers who transformed their business</p>
-    </div>
-    
-    <div class="flex flex-wrap -m-4">
-      {/* Testimonial 1 */}
-      <div class="p-4 lg:w-1/2 w-full">
-        <div class="h-full bg-white/80 backdrop-blur-sm p-8 rounded-2xl border border-pink-100 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden">
-          <div class="absolute -top-10 -right-10 w-20 h-20 bg-pink-100 rounded-full opacity-50"></div>
-          <div class="flex items-start mb-6">
-            <div class="shrink-0">
-              <div class="w-16 h-16 rounded-full bg-linear-to-br from-pink-400 to-rose-400 p-0.5">
-                <img alt="testimonial" src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80" class="w-full h-full rounded-full object-cover"/>
+      {/* Testimonials */}
+      <section className="text-gray-900 body-font bg-pink-50 font-bold" id="testinomial">
+        <div className="container px-5 py-24 mx-auto">
+          <div className="flex flex-col text-center w-full mb-16">
+            <h1 className="sm:text-6xl  lg:text-6xl font-bold mb-4 text-black">What Our <span className="text-pink-600">Clients</span> Say</h1>
+          </div>
+          <div className="flex flex-wrap -m-4">
+             {/* Testimonial 1 */}
+            <div className="p-4 md:w-1/2 w-full">
+              <div className="h-full bg-white p-8 rounded-lg shadow-md  border-pink-600 border-2">
+                <p className="leading-relaxed mb-6 text-gray-600">"The best spa experience I've ever had. The staff is professional and the atmosphere is incredibly relaxing. Highly recommended!"</p>
+                <a className="inline-flex items-center">
+                  <img alt="testimonial" src="https://dummyimage.com/106x106" className="w-12 h-12 rounded-full shrink-0 object-cover object-center"/>
+                  <span className="grow flex flex-col pl-4">
+                    <span className="title-font font-medium text-gray-900">Sarah Johnson</span>
+                    <span className="text-gray-500 text-sm">Regular Customer</span>
+                  </span>
+                </a>
               </div>
             </div>
-            <div class="ml-6">
-              <h3 class="text-xl font-bold text-gray-900">Sarah Johnson</h3>
-              <p class="text-pink-500 font-medium">CEO, TechSolutions Inc.</p>
-              <div class="flex mt-1">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                  </svg>
-                ))}
+             {/* Testimonial 2 */}
+            <div className="p-4 md:w-1/2 w-full">
+              <div className="h-full bg-white p-8 rounded-lg shadow-md  border-pink-600 border-2">
+                <p className="leading-relaxed mb-6 text-gray-600">"I love their makeup services for special occasions. They always make me look and feel my best. The products they use are top notch."</p>
+                <a className="inline-flex items-center">
+                  <img alt="testimonial" src="https://dummyimage.com/107x107" className="w-12 h-12 rounded-full shrink-0 object-cover object-center"/>
+                  <span className="grow flex flex-col pl-4">
+                    <span className="title-font font-medium text-gray-900">Emily Davis</span>
+                    <span className="text-gray-500 text-sm">Model</span>
+                  </span>
+                </a>
               </div>
             </div>
           </div>
-          <p class="leading-relaxed text-gray-700 italic text-lg mb-6">
-            "This platform transformed our workflow. We've seen a 40% increase in productivity since implementation. The support team is exceptional!"
-          </p>
-          <div class="flex items-center justify-between">
-            <span class="inline-flex items-center text-pink-600">
-              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
-              </svg>
-              Watch Video Testimonial
-            </span>
-            <span class="text-sm text-gray-500">Joined March 2023</span>
-          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Testimonial 2 */}
-      <div class="p-4 lg:w-1/2 w-full">
-        <div class="h-full bg-linear-to-br from-white to-pink-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden border border-rose-100">
-          <div class="absolute -bottom-10 -left-10 w-24 h-24 bg-rose-100 rounded-full opacity-30"></div>
-          <div class="flex items-start mb-6">
-            <div class="shrink-0">
-              <div class="w-16 h-16 rounded-full bg-linear-to-br from-rose-400 to-pink-400 p-0.5">
-                <img alt="testimonial" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80" class="w-full h-full rounded-full object-cover"/>
+      {/* Contact Section */}
+      <section className="text-gray-900 body-font relative bg-pink-200" id="contact">
+        <div className="container px-5 py-24 mx-auto">
+          <div className="flex flex-col text-center w-full mb-12">
+            <h1 className="sm:text-3xl lg:text-6xl font-bold title-font mb-4 text-gray-900">Contact Us</h1>
+            <p className="lg:w-2/3 mx-auto leading-relaxed text-base">We'd love to hear from you. Drop us a message!</p>
+          </div>
+          <div className="lg:w-1/2 md:w-2/3 mx-auto">
+            <div className="flex flex-wrap -m-2">
+              <div className="p-2 w-1/2">
+                <div className="relative">
+                  <label htmlFor="name" className="leading-7 text-sm text-gray-600">Name</label>
+                  <input type="text" id="name" name="name" className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-pink-500 focus:bg-white focus:ring-2 focus:ring-pink-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"/>
+                </div>
+              </div>
+              <div className="p-2 w-1/2">
+                <div className="relative">
+                  <label htmlFor="email" className="leading-7 text-sm text-gray-600">Email</label>
+                  <input type="email" id="email" name="email" className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-pink-500 focus:bg-white focus:ring-2 focus:ring-pink-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"/>
+                </div>
+              </div>
+              <div className="p-2 w-full">
+                <div className="relative">
+                  <label htmlFor="message" className="leading-7 text-sm text-gray-600">Message</label>
+                  <textarea id="message" name="message" className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-pink-500 focus:bg-white focus:ring-2 focus:ring-pink-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"></textarea>
+                </div>
+              </div>
+              <div className="p-2 w-full">
+                <button className="flex mx-auto text-white bg-pink-500 border-0 py-2 px-8 focus:outline-none hover:bg-pink-600 rounded text-lg">Send Message</button>
               </div>
             </div>
-            <div class="ml-6">
-              <h3 class="text-xl font-bold text-gray-900">Michael Chen</h3>
-              <p class="text-pink-500 font-medium">CTO, InnovateLabs</p>
-              <div class="flex mt-1">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                  </svg>
-                ))}
-              </div>
-            </div>
-          </div>
-          <p class="leading-relaxed text-gray-700 italic text-lg mb-6">
-            "The analytics features alone paid for the entire platform in the first quarter. Our team collaboration has never been smoother."
-          </p>
-          <div class="flex items-center">
-            <span class="inline-flex items-center px-4 py-2 bg-pink-100 text-pink-700 rounded-full text-sm font-medium">
-              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"/>
-              </svg>
-              75% Revenue Growth
-            </span>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
 
-    {/* Stats Section */}
-    <div class="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6">
-      <div class="text-center p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-pink-100">
-        <div class="text-4xl font-bold bg-linear-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent">10K+</div>
-        <p class="text-gray-600 mt-2">Happy Customers</p>
-      </div>
-      <div class="text-center p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-pink-100">
-        <div class="text-4xl font-bold bg-linear-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent">4.9</div>
-        <p class="text-gray-600 mt-2">Average Rating</p>
-      </div>
-      <div class="text-center p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-pink-100">
-        <div class="text-4xl font-bold bg-linear-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent">24/7</div>
-        <p class="text-gray-600 mt-2">Support Available</p>
-      </div>
-      <div class="text-center p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-pink-100">
-        <div class="text-4xl font-bold bg-linear-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent">98%</div>
-        <p class="text-gray-600 mt-2">Satisfaction Rate</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-{/* Enhanced Contact Section */}
-<section class="text-gray-900 body-font relative" id="contact">
-  <div class="absolute inset-0 bg-linear-to-br from-white via-pink-50 to-white -z-10"></div>
-  
-  <div class="container px-5 py-24 mx-auto">
-    <div class="lg:w-4/5 mx-auto flex flex-wrap">
-      {/* Left Content */}
-      <div class="lg:w-1/2 w-full lg:pr-10 lg:py-6 mb-10 lg:mb-0">
-        <span class="text-pink-500 font-semibold tracking-widest text-sm">GET IN TOUCH</span>
-        <h1 class="text-4xl font-bold text-gray-900 mb-6 mt-2">Let's Create <span class="bg-linear-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent">Something Amazing</span> Together</h1>
-        <p class="text-gray-600 text-lg mb-8 leading-relaxed">
-          Have a project in mind? We'd love to hear about it. Send us a message and we'll get back to you within 24 hours.
-        </p>
-        
-        {/* Contact Info Cards */}
-        <div class="space-y-6">
-          <div class="flex items-center p-4 bg-white rounded-xl shadow-lg border border-pink-100">
-            <div class="shrink-0 w-12 h-12 bg-linear-to-r from-pink-100 to-rose-100 rounded-lg flex items-center justify-center">
-              <svg class="w-6 h-6 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
-              </svg>
-            </div>
-            <div class="ml-4">
-              <h3 class="font-bold text-gray-900">Email Us</h3>
-              <a href="mailto:hello@example.com" class="text-pink-600 hover:text-pink-700">hello@example.com</a>
-            </div>
-          </div>
-          
-          <div class="flex items-center p-4 bg-white rounded-xl shadow-lg border border-pink-100">
-            <div class="shrink-0 w-12 h-12 bg-linear-to-r from-pink-100 to-rose-100 rounded-lg flex items-center justify-center">
-              <svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-              </svg>
-            </div>
-            <div class="ml-4">
-              <h3 class="font-bold text-gray-900">Call Us</h3>
-              <a href="tel:+1234567890" class="text-pink-600 hover:text-pink-700">+1 (234) 567-890</a>
-            </div>
-          </div>
-          
-          <div class="flex items-center p-4 bg-white rounded-xl shadow-lg border border-pink-100">
-            <div class="shrink-0 w-12 h-12 bg-linear-to-r from-pink-100 to-rose-100 rounded-lg flex items-center justify-center">
-              <svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
-            </div>
-            <div class="ml-4">
-              <h3 class="font-bold text-gray-900">Visit Us</h3>
-              <p class="text-gray-600">123 Rose Avenue<br/>San Francisco, CA 94107</p>
-            </div>
-          </div>
-        </div>
-        
-        {/* Social Links */}
-        <div class="mt-8">
-          <h4 class="font-bold text-gray-900 mb-4">Follow Us</h4>
-          <div class="flex space-x-4">
-            {['Twitter', 'LinkedIn', 'Instagram', 'Facebook'].map((platform, index) => (
-              <a key={index} href="#" class="w-12 h-12 bg-linear-to-br from-pink-100 to-rose-100 rounded-xl flex items-center justify-center hover:from-pink-200 hover:to-rose-200 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                <span class="text-pink-600 font-bold">{platform.charAt(0)}</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Contact Form */}
-      <div class="lg:w-1/2 w-full">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 border border-pink-100">
-          <div class="relative mb-8">
-            <div class="absolute -inset-0.5 bg-linear-to-r from-pink-500 to-rose-500 rounded-2xl blur opacity-30"></div>
-            <div class="relative bg-white p-6 rounded-2xl">
-              <h2 class="text-2xl font-bold text-gray-900 mb-2">Send us a message</h2>
-              <p class="text-gray-600">We typically respond within 24 hours</p>
-            </div>
-          </div>
-          
-          <form class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                <input type="text" class="w-full px-4 py-3 bg-pink-50 border border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all duration-300" placeholder="John"/>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                <input type="text" class="w-full px-4 py-3 bg-pink-50 border border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all duration-300" placeholder="Doe"/>
-              </div>
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-              <input type="email" class="w-full px-4 py-3 bg-pink-50 border border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all duration-300" placeholder="john@example.com"/>
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Company</label>
-              <input type="text" class="w-full px-4 py-3 bg-pink-50 border border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all duration-300" placeholder="Your Company"/>
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Project Type</label>
-              <select class="w-full px-4 py-3 bg-pink-50 border border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all duration-300">
-                <option>Select project type</option>
-                <option>Web Development</option>
-                <option>Mobile App</option>
-                <option>UX/UI Design</option>
-                <option>Consultation</option>
-                <option>Other</option>
-              </select>
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
-              <textarea rows="4" class="w-full px-4 py-3 bg-pink-50 border border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all duration-300 resize-none" placeholder="Tell us about your project..."></textarea>
-            </div>
-            
-            <div class="flex items-center">
-              <input type="checkbox" class="w-4 h-4 text-pink-500 bg-pink-50 border-pink-300 rounded focus:ring-pink-500"/>
-              <label class="ml-2 text-sm text-gray-600">I agree to the privacy policy and terms of service</label>
-            </div>
-            
-            <button type="submit" class="w-full py-4 px-6 bg-linear-to-r from-pink-500 to-rose-500 text-white font-bold rounded-xl hover:from-pink-600 hover:to-rose-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl group">
-              <span class="flex items-center justify-center">
-                Send Message
-                <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                </svg>
-              </span>
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-{/* Enhanced Footer */}
-<footer class="text-gray-900 body-font bg-linear-to-b from-white to-pink-50 pt-20">
-  {/* Newsletter Section */}
-  <div class="container px-5 mx-auto mb-16">
-    <div class="lg:w-2/3 mx-auto">
-      <div class="bg-linear-to-r from-pink-500 to-rose-500 rounded-2xl p-8 shadow-2xl">
-        <div class="flex flex-col lg:flex-row items-center justify-between">
-          <div class="lg:w-2/3 mb-8 lg:mb-0 lg:pr-8">
-            <h2 class="text-3xl font-bold text-white mb-4">Stay Updated</h2>
-            <p class="text-pink-100">Subscribe to our newsletter for the latest updates, tips, and exclusive offers.</p>
-          </div>
-          <div class="w-full lg:w-1/3">
-            <div class="flex">
-              <input type="email" placeholder="Your email" class="w-full px-4 py-3 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-pink-300"/>
-              <button class="bg-white text-pink-600 font-bold px-6 py-3 rounded-r-xl hover:bg-pink-50 transition-colors">
-                Subscribe
-              </button>
-            </div>
-            <p class="text-pink-100 text-xs mt-2">No spam, unsubscribe anytime.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {/* Main Footer Content */}
-  <div class="container px-5 mx-auto ">
-    <div class="flex flex-wrap md:flex-nowrap">
-      {/* Brand Section */}
-      <div class="w-full md:w-1/3 mb-10 md:mb-0 md:pr-10">
-        <a class="flex title-font font-bold items-center text-gray-900 mb-4">
-         
-         <img src={logo} />
-       
-        </a>
-        <p class="text-gray-600 mt-4">Creating beautiful digital experiences with passion and innovation. Transforming ideas into reality.</p>
-        {/* <div class="flex mt-6 space-x-3">
-          {['Twitter', 'Facebook', 'Instagram', 'LinkedIn', 'YouTube'].map((platform, index) => (
-            <a key={index} href="#" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-pink-100">
-              <span class="text-pink-500 text-sm font-bold">{platform.charAt(0)}</span>
+      {/* Footer */}
+      <footer className="text-gray-600 body-font bg-pink-100 font-bold cursor-pointer ">
+        <div className="container px-5 py-24 mx-auto flex md:items-center lg:items-start md:flex-row flex-col flex-wrap">
+          <div className="w-64 shrink-0 md:mx-0 mx-auto text-center md:text-left">
+            <a className="flex title-font font-medium items-center md:justify-start justify-center text-gray-900">
+               <img src={logo} className="h-10" alt="Logo" />
+              {/* <span className="ml-3 text-xl font-bold">BeautyStore</span> */}
             </a>
-          ))}
-        </div> */}
-      </div>
-
-      {/* Links Sections */}
-      <div class="w-full md:w-2/3">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <div>
-            <h3 class="font-bold text-gray-900 text-lg mb-4">Product</h3>
-            <ul class="space-y-3">
-              {['Features', 'Pricing', 'API', 'Documentation', 'Status'].map((item, index) => (
-                <li key={index}>
-                  <a href="#" class="text-gray-600 hover:text-pink-500 transition-colors">{item}</a>
-                </li>
-              ))}
-            </ul>
+            <p className="mt-2 text-sm text-gray-500">Your one-stop destination for all things beauty.</p>
           </div>
-          
-          <div>
-            <h3 class="font-bold text-gray-900 text-lg mb-4">Company</h3>
-            <ul class="space-y-3">
-              {['About', 'Blog', 'Careers', 'Press', 'Partners'].map((item, index) => (
-                <li key={index}>
-                  <a href="#" class="text-gray-600 hover:text-pink-500 transition-colors">{item}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          <div>
-            <h3 class="font-bold text-gray-900 text-lg mb-4">Resources</h3>
-            <ul class="space-y-3">
-              {['Help Center', 'Community', 'Contact', 'Privacy', 'Terms'].map((item, index) => (
-                <li key={index}>
-                  <a href="#" class="text-gray-600 hover:text-pink-500 transition-colors">{item}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          <div>
-            <h3 class="font-bold text-gray-900 text-lg mb-4">Legal</h3>
-            <ul class="space-y-3">
-              {['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'GDPR', 'Compliance'].map((item, index) => (
-                <li key={index}>
-                  <a href="#" class="text-gray-600 hover:text-pink-500 transition-colors">{item}</a>
-                </li>
-              ))}
-            </ul>
+          <div className="grow flex flex-wrap md:pl-20 -mb-10 md:mt-0 mt-10 md:text-left text-center">
+            <div className="lg:w-1/3 md:w-1/2 w-full px-4">
+              <h2 className="title-font font-bold text-gray-900 tracking-widest text-sm mb-3">CATEGORIES</h2>
+              <nav className="list-none mb-10">
+                <li><a className="text-gray-600 hover:text-gray-800">Skincare</a></li>
+                <li><a className="text-gray-600 hover:text-gray-800">Makeup</a></li>
+                <li><a className="text-gray-600 hover:text-gray-800">Haircare</a></li>
+                <li><a className="text-gray-600 hover:text-gray-800">Fragrance</a></li>
+              </nav>
+            </div>
+            <div className="lg:w-1/3 md:w-1/2 w-full px-4">
+              <h2 className="title-font font-bold text-gray-900 tracking-widest text-sm mb-3">SUPPORT</h2>
+              <nav className="list-none mb-10">
+                <li><a className="text-gray-600 hover:text-gray-800">Contact Us</a></li>
+                <li><a className="text-gray-600 hover:text-gray-800">FAQ</a></li>
+                <li><a className="text-gray-600 hover:text-gray-800">Returns</a></li>
+                <li><a className="text-gray-600 hover:text-gray-800">Shipping</a></li>
+              </nav>
+            </div>
+             <div className="lg:w-1/3 md:w-1/2 w-full px-4">
+              <h2 className="title-font font-bold text-gray-900 tracking-widest text-sm mb-3">LEGAL</h2>
+              <nav className="list-none mb-10">
+                <li><a className="text-gray-600 hover:text-gray-800">Privacy Policy</a></li>
+                <li><a className="text-gray-600 hover:text-gray-800">Terms of Service</a></li>
+              </nav>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-
-   
-    {/* Bottom Bar */}
-    <div class="mt-12 pt-8 border-t border-pink-100">
-      <div class="flex flex-col md:flex-row justify-between items-center">
-        <p class="text-black text-xl ">
-          © 2026 Iqra Aslam. All rights reserved.
-        </p>
-       
-      </div>
-    </div>
-  </div>
-</footer>
-
-
-    
-
-      {/* Testimonials, Contact, Footer sections remain unchanged */}
-
+        <div className="bg-gray-100">
+          <div className="container mx-auto py-4 px-5 flex flex-wrap flex-col sm:flex-row">
+            <p className="text-gray-500 text-sm text-center sm:text-left">© 2026 BeautyStore —
+              <a href="#" className="text-pink-600 ml-1 font-bold text-xl" rel="noopener noreferrer" target="_blank">@iqraaslam</a>
+            </p>
+            <span className="inline-flex sm:ml-auto sm:mt-0 mt-2 justify-center sm:justify-start">
+              <a className="text-gray-500">
+                <svg fill="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
+                  <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
+                </svg>
+              </a>
+              <a className="ml-3 text-gray-500">
+                <svg fill="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
+                  <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path>
+                </svg>
+              </a>
+              <a className="ml-3 text-gray-500">
+                <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
+                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+                  <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01"></path>
+                </svg>
+              </a>
+            </span>
+          </div>
+        </div>
+      </footer>
     </>
   );
 }
